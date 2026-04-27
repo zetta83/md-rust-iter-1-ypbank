@@ -195,10 +195,15 @@ TO_USER_ID: 9223372036854775807
         {
             let mut cursor = Cursor::new(&mut buffer);
             let mut buff_writer = BufWriter::new(&mut cursor);
-            assert_eq!(ParserTxt::<std::io::Empty>::write_record(&record, &mut buff_writer), Ok(()))
+            assert_eq!(
+                ParserTxt::<std::io::Empty>::write_record(&record, &mut buff_writer),
+                Ok(())
+            )
         }
 
-        assert_eq!(String::from_utf8(buffer).unwrap(), r#"TX_ID: 1000000000000000
+        assert_eq!(
+            String::from_utf8(buffer).unwrap(),
+            r#"TX_ID: 1000000000000000
 TX_TYPE: DEPOSIT
 FROM_USER_ID: 0
 TO_USER_ID: 9223372036854775807
@@ -207,7 +212,8 @@ TIMESTAMP: 1633036860000
 STATUS: FAILURE
 DESCRIPTION: "Record number 1"
 
-"#);
+"#
+        );
     }
 
     #[test]

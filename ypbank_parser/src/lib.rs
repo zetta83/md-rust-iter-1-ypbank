@@ -8,8 +8,8 @@ pub mod types;
 
 pub use bin_format::ParserBin;
 pub use csv_format::ParserCsv;
-pub use txt_format::ParserTxt;
-pub use parser::ParserByType;
 pub use errors::ParserError;
+pub use parser::ParserByType;
+pub use txt_format::ParserTxt;
 // pub use record::Record;
 pub use types::*;

@@ -351,22 +351,28 @@ mod tests {
         let mut buffer = Vec::new();
 
         let record = CsvRecord::new(
-                1000000000000000,
-                TxType::Deposit,
-                0,
-                9223372036854775807,
-                100,
-                (datetime!(2021-09-30 21:21:00 UTC).unix_timestamp() as u64) * 1000,
-                TxStatus::Failure,
-                "\"Record number 1\"",
-            );
+            1000000000000000,
+            TxType::Deposit,
+            0,
+            9223372036854775807,
+            100,
+            (datetime!(2021-09-30 21:21:00 UTC).unix_timestamp() as u64) * 1000,
+            TxStatus::Failure,
+            "\"Record number 1\"",
+        );
 
         {
             let mut cursor = Cursor::new(&mut buffer);
             let mut buff_writer = BufWriter::new(&mut cursor);
-            assert_eq!(ParserCsv::<std::io::Empty>::write_record(&record, &mut buff_writer), Ok(()))
+            assert_eq!(
+                ParserCsv::<std::io::Empty>::write_record(&record, &mut buff_writer),
+                Ok(())
+            )
         }
 
-        assert_eq!(String::from_utf8(buffer).unwrap(), "1000000000000000,DEPOSIT,0,9223372036854775807,100,1633036860000,FAILURE,\"Record number 1\"\n");
+        assert_eq!(
+            String::from_utf8(buffer).unwrap(),
+            "1000000000000000,DEPOSIT,0,9223372036854775807,100,1633036860000,FAILURE,\"Record number 1\"\n"
+        );
     }
 }
