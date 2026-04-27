@@ -25,6 +25,7 @@ pub struct Record {
 }
 
 impl Record {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         id: EntityID,
         tx_type: TxType,

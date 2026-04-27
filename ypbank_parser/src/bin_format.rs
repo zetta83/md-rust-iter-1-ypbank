@@ -68,7 +68,7 @@ impl From<TxStatus> for u8 {
 }
 
 impl BinRecord {
-    fn make_header(&self, body: &Vec<u8>) -> HeaderBinRecord {
+    fn make_header(&self, body: &[u8]) -> HeaderBinRecord {
         HeaderBinRecord {
             magic: MAGIC_HEADER,
             record_size: body.len() as u32,
@@ -148,14 +148,14 @@ impl<R: Read> Iterator for ParserBin<R> {
         }
 
         let mut record_size_u8 = [0u8; 4];
-        if let Err(_) = self.reader.read_exact(&mut record_size_u8) {
+        if self.reader.read_exact(&mut record_size_u8).is_err() {
             return Some(Err(ParserError::NotImplemented));
         };
 
         let record_size = u32::from_be_bytes(record_size_u8);
         let mut body = vec![0u8; record_size as usize];
 
-        if let Err(_) = self.reader.read_exact(&mut body) {
+        if self.reader.read_exact(&mut body).is_err() {
             return Some(Err(ParserError::NotImplemented));
         }
 
@@ -178,7 +178,7 @@ impl<R: Read> Iterator for ParserBin<R> {
             i64::from_be_bytes(amount.try_into().expect("too many bytes")),
             u64::from_be_bytes(timestamp.try_into().expect("too many bytes")),
             TxStatus::try_from(status[0]).expect("transaction status"),
-            &String::from_utf8_lossy(description).to_string(),
+            String::from_utf8_lossy(description).as_ref(),
         )))
     }
 }
@@ -193,7 +193,7 @@ mod tests {
 
     #[test]
     fn test_read_from() {
-        let data = vec![
+        let data = [
             89, 80, 66, 78, 0, 0, 0, 63, 0, 3, 141, 126, 164, 198, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 127, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 1, 124, 56,
             148, 250, 96, 1, 0, 0, 0, 17, 34, 82, 101, 99, 111, 114, 100, 32, 110, 117, 109, 98,

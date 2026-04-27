@@ -145,7 +145,7 @@ FROM_USER_ID: 9223372036854775807
 TO_USER_ID: 9223372036854775807
 
 "#;
-        let mut cursor = Cursor::new(&data[..]);
+        let mut cursor = Cursor::new(data);
         let buffer = BufReader::new(&mut cursor);
 
         let mut parser = ParserTxt::read_from(buffer).unwrap();

@@ -18,7 +18,7 @@ impl<'a> Display for CsvDisplay<'a> {
         writeln!(
             f,
             "{}",
-            vec![
+            [
                 item.id.to_string(),
                 String::from(item.tx_type.clone()),
                 item.from_user_id.to_string(),
@@ -262,7 +262,7 @@ mod tests {
     #[test]
     fn test_read_from_empty_header() {
         let data = r#"1000000000000000,DEPOSIT,0,9223372036854775807,100,1633036860000,FAILURE,"Record number 1"#;
-        let mut cursor = Cursor::new(&data[..]);
+        let mut cursor = Cursor::new(data);
         let buffer = BufReader::new(&mut cursor);
 
         assert!(matches!(
@@ -278,7 +278,7 @@ mod tests {
 1000000000000001,TRANSFER,9223372036854775807,9223372036854775807,200,1633036920000,PENDING,"Record number 2"
 "#;
 
-        let mut cursor = Cursor::new(&data[..]);
+        let mut cursor = Cursor::new(data);
         let buffer = BufReader::new(&mut cursor);
         let mut parser = ParserCsv::read_from(buffer).unwrap();
 
