@@ -11,5 +11,4 @@ pub use csv_format::ParserCsv;
 pub use errors::ParserError;
 pub use parser::ParserByType;
 pub use txt_format::ParserTxt;
-// pub use record::Record;
 pub use types::*;

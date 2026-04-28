@@ -3,13 +3,26 @@ use crate::record::Record;
 use crate::{Parser, ParserBin, ParserCsv, ParserTxt};
 use std::io::{Read, Write};
 
+/// Тип-перечисление, объединяющий различные реализации парсеров (CSV, TXT, BIN).
+/// Позволяет единообразно работать с разными форматами входных данных.
 pub enum ParserByType<R: Read> {
+    /// Вариант для CSV-парсера
     Csv(ParserCsv<R>),
+    /// Вариант для TXT-парсера
     Txt(ParserTxt<R>),
+    /// Вариант для бинарного парсера
     Bin(ParserBin<R>),
 }
 
 impl<R: Read> ParserByType<R> {
+    /// Создаёт экземпляр `ParserByType` на основе указанного формата.
+    ///
+    /// # Arguments
+    /// * `format` - Строка, определяющая формат: "csv", "txt" или "bin"
+    /// * `reader` - Объект, реализующий трейт `Read`, откуда будут читаться данные
+    ///
+    /// # Errors
+    /// Возвращает `ParserError::InvalidFormat`, если передан неподдерживаемый формат
     pub fn from_format(format: &str, reader: R) -> Result<Self, ParserError> {
         match format {
             "csv" => Ok(ParserByType::Csv(ParserCsv::read_from(reader)?)),
@@ -19,6 +32,15 @@ impl<R: Read> ParserByType<R> {
         }
     }
 
+    /// Преобразует данные из текущего формата в целевой формат и записывает их в `writer`.
+    ///
+    /// # Arguments
+    /// * `output_format` - Целевой формат ("csv", "txt" или "bin")
+    /// * `writer` - Объект, реализующий `Write`, куда будут записаны преобразованные данные
+    ///
+    /// # Errors
+    /// Возвращает `ParserError::ConversionNotSupported`, если преобразование между указанными
+    /// форматами невозможно
     pub fn convert_to<W: Write>(
         &mut self,
         output_format: &str,
@@ -39,6 +61,11 @@ impl<R: Read> ParserByType<R> {
     }
 }
 
+/// Реализация трейта `Parser` для `ParserByType`.
+///
+/// # Panics
+/// Методы `read_from` и `write_record` не реализованы и вызовут панику при использовании.
+/// Вместо них следует использовать `ParserByType::from_format()` для создания экземпляра.
 impl<R: Read> Parser for ParserByType<R> {
     type Reader = R;
 
@@ -54,6 +81,13 @@ impl<R: Read> Parser for ParserByType<R> {
     }
 }
 
+/// Реализация `Iterator` для `ParserByType`.
+/// Позволяет последовательно получать записи (`Record`) из парсера в зависимости от выбранного формата.
+///
+/// # Yields
+/// * `Some(Ok(Record))` - успешно прочитанная запись
+/// * `Some(Err(ParserError))` - ошибка при чтении записи
+/// * `None` - достигнут конец данных
 impl<R: Read> Iterator for ParserByType<R> {
     type Item = Result<Record, ParserError>;
 
