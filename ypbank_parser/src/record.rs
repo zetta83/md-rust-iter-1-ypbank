@@ -63,16 +63,6 @@ pub enum TxType {
     Withdrawal,
 }
 
-// impl From<TxType> for String {
-//     fn from(tx_type: TxType) -> Self {
-//         match tx_type {
-//             TxType::Deposit => "Deposit".to_uppercase(),
-//             TxType::Transfer => "Transfer".to_uppercase(),
-//             TxType::Withdrawal => "Withdrawal".to_uppercase(),
-//         }
-//     }
-// }
-
 impl TxType {
     pub fn as_str(&self) -> &'static str {
         match self {
@@ -106,16 +96,6 @@ pub enum TxStatus {
     /// Транзакция в обработке
     Pending,
 }
-
-// impl From<TxStatus> for String {
-//     fn from(status: TxStatus) -> Self {
-//         match status {
-//             TxStatus::Success => "Success".to_uppercase(),
-//             TxStatus::Failure => "Failure".to_uppercase(),
-//             TxStatus::Pending => "Pending".to_uppercase(),
-//         }
-//     }
-// }
 
 impl TxStatus {
     pub fn as_str(&self) -> &'static str {
