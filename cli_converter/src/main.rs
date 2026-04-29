@@ -27,7 +27,8 @@ fn main() -> Result<(), ParserError> {
 
     ParserByType::from_format(
         &args.input_format,
-        fs::File::open(&args.input).expect("input file not found"),
+        fs::File::open(&args.input)
+            .map_err(|e| ParserError::IoError(format!("input file not found: {}", e)))?,
     )?
     .convert_to(&args.output_format, &mut io::stdout())?;
 

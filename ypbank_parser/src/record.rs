@@ -1,21 +1,23 @@
 use crate::errors::{ParseRecordError, ParserError};
 use std::fmt::Debug;
 
+/// Основная структура, представляющая транзакционную запись
 #[derive(Eq, PartialEq, Debug)]
 pub struct Record {
     /// Уникальный идентификатор транзакции.
     pub id: EntityID,
-    /// Тип транзакции
+    /// Тип транзакции (Deposit, Transfer, Withdrawal)
     pub tx_type: TxType,
     /// Счёт отправителя; `0` для DEPOSIT.
     pub from_user_id: EntityID,
     /// Счёт получателя; `0` для WITHDRAWAL.
     pub to_user_id: EntityID,
-    /// Сумма в наименьшей денежной единице (центах). Положительное значение для зачислений, отрицательное для списаний.
+    /// Сумма в наименьшей денежной единице (центах).
+    /// Положительное значение для зачислений, отрицательное для списаний.
     pub amount: i64,
     /// Время выполнения транзакции в миллисекундах от эпохи Unix.
     pub timestamp: u64,
-    /// Статус транзакции
+    /// Статус транзакции (Success, Failure, Pending)
     pub status: TxStatus,
     /// Текстовое описание транзакции.(Необязательное текстовое описание.)
     ///  bin - Если описание отсутствует, DESC_LEN равен 0.
@@ -25,6 +27,7 @@ pub struct Record {
 }
 
 impl Record {
+    /// Создаёт новую запись транзакции
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         id: EntityID,
@@ -50,19 +53,22 @@ impl Record {
 }
 
 /// Тип транзакции
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum TxType {
+    /// Пополнение счёта (from_user_id = 0)
     Deposit,
+    /// Перевод между счетами
     Transfer,
+    /// Списание со счёта (to_user_id = 0)
     Withdrawal,
 }
 
-impl From<TxType> for String {
-    fn from(tx_type: TxType) -> Self {
-        match tx_type {
-            TxType::Deposit => "Deposit".to_uppercase(),
-            TxType::Transfer => "Transfer".to_uppercase(),
-            TxType::Withdrawal => "Withdrawal".to_uppercase(),
+impl TxType {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            TxType::Deposit => "DEPOSIT",
+            TxType::Transfer => "TRANSFER",
+            TxType::Withdrawal => "WITHDRAWAL",
         }
     }
 }
@@ -81,19 +87,22 @@ impl TryFrom<&str> for TxType {
 }
 
 /// Статус транзакции
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum TxStatus {
+    /// Транзакция успешно выполнена
     Success,
+    /// Транзакция не выполнена
     Failure,
+    /// Транзакция в обработке
     Pending,
 }
 
-impl From<TxStatus> for String {
-    fn from(status: TxStatus) -> Self {
-        match status {
-            TxStatus::Success => "Success".to_uppercase(),
-            TxStatus::Failure => "Failure".to_uppercase(),
-            TxStatus::Pending => "Pending".to_uppercase(),
+impl TxStatus {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            TxStatus::Success => "SUCCESS",
+            TxStatus::Failure => "FAILURE",
+            TxStatus::Pending => "PENDING",
         }
     }
 }
@@ -111,6 +120,7 @@ impl TryFrom<&str> for TxStatus {
     }
 }
 
+/// Тип для идентификаторов сущностей (пользователей, транзакций)
 pub type EntityID = u64;
 
 #[cfg(test)]
@@ -118,15 +128,15 @@ mod tests {
     use crate::record::{TxStatus, TxType};
     #[test]
     fn test_tx_type_to_string() {
-        assert_eq!(String::from(TxType::Deposit), "DEPOSIT");
-        assert_eq!(String::from(TxType::Transfer), "TRANSFER");
-        assert_eq!(String::from(TxType::Withdrawal), "WITHDRAWAL");
+        assert_eq!(TxType::Deposit.as_str(), "DEPOSIT");
+        assert_eq!(TxType::Transfer.as_str(), "TRANSFER");
+        assert_eq!(TxType::Withdrawal.as_str(), "WITHDRAWAL");
     }
 
     #[test]
     fn test_tx_status_to_string() {
-        assert_eq!(String::from(TxStatus::Success), "SUCCESS");
-        assert_eq!(String::from(TxStatus::Failure), "FAILURE");
-        assert_eq!(String::from(TxStatus::Pending), "PENDING");
+        assert_eq!(TxStatus::Success.as_str(), "SUCCESS");
+        assert_eq!(TxStatus::Failure.as_str(), "FAILURE");
+        assert_eq!(TxStatus::Pending.as_str(), "PENDING");
     }
 }
